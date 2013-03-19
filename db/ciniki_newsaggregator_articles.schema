@@ -1,0 +1,34 @@
+#
+# Description
+# -----------
+# This table stores the articles for news feeds.
+#
+# Fields
+# ------
+# id:				The unique ID for each feed.
+# uuid:				The Universal Unique ID for each feed.
+#
+# feed_id:			The ID of the feed the article is attached to.
+# title:			The title for the article.
+# url:				The URL to the article on the website from the feed.
+# content:			The description or content of the article.
+# published_date:	The UTC date and time of pubDate from the rss feed.
+# guid:				The globally unique identified passed in the rss feed for the article.
+#
+# date_added:		The UTC date and time the RSS feed was added to the system.
+# last_updated:		The UTC date and time the feed info was last updated.
+#
+CREATE TABLE ciniki_newsaggregator_articles (
+	id bigint not null auto_increment PRIMARY KEY,
+	uuid char(36) not null,
+	feed_id int not null,
+	title varchar(255) not null,
+	url varchar(255) not null,
+	content longtext not null,
+	published_date datetime not null,
+	guid varchar(255) not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	unique index (feed_id, guid),
+	index uuid (uuid, last_updated)
+) ENGINE=InnoDB, COMMENT='v1.01';

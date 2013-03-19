@@ -1,0 +1,36 @@
+#
+# Description
+# -----------
+# This table stores the users who have read an article, or bookmarked the article.
+# 
+# This table does not link to the businesses because we want a read article to appear
+# read in all businesses the user is a part of.
+#
+# Fields
+# ------
+# id:					The ID of the article user.
+# uuid:					The Universal Unique ID for the article user.
+#
+# article_id:			The ID of the article the user read/bookmarked.
+#
+# user_id:				The ID of the user who read/bookmarked the article.
+#
+# flags:				The flags for the article for the user
+#					
+#						0x01 - read
+#						0x02 - keep unread
+#						0x10 - bookmarked/starred (saved)
+#
+# date_added:			The UTC date and time the record was added.
+# last_updated:			The UTC date and time the record was updated.
+#
+CREATE TABLE ciniki_newsaggregator_article_users (
+	id bigint not null auto_increment PRIMARY KEY,
+	uuid char(36) not null,
+	article_id int not null,
+	user_id int not null,
+	flags tinyint unsigned not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	index uuid (uuid, last_updated)
+) ENGINE=InnoDB, COMMENT='v1.01';
