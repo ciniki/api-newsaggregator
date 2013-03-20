@@ -10,8 +10,7 @@
 // =======
 // <rsp stat="ok" />
 //
-function ciniki_newsaggregator_updateRSSArticles($ciniki, $feed_id, $rss) {
-
+function ciniki_newsaggregator_updateRSSArticles(&$ciniki, $feed_id, $rss) {
 	//
 	// Get the existing articles for the RSS feed
 	//
@@ -19,7 +18,7 @@ function ciniki_newsaggregator_updateRSSArticles($ciniki, $feed_id, $rss) {
 	if( $num_articles < 1 ) {
 		$num_articles = 25;
 	}
-	$strsql = "SELECT guid, UNIX_TIMESTAMP(last_updated) "
+	$strsql = "SELECT guid, UNIX_TIMESTAMP(last_updated) AS last_updated "
 		. "FROM ciniki_newsaggregator_articles "
 		. "WHERE feed_id = '" . ciniki_core_dbQuote($ciniki, $feed_id) . "' "
 		. "ORDER BY published_date DESC "
@@ -33,22 +32,30 @@ function ciniki_newsaggregator_updateRSSArticles($ciniki, $feed_id, $rss) {
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
+	$articles = array();
 	if( isset($rc['articles']) ) {
 		$articles = $rc['articles'];	
-	} else {
-		$articles = array();
 	}
 
-	foreach($rss->channel->item as $item) {
+	if( isset($rss->channel->item) ) {
+		$items = $rss->channel->item;
+	} elseif( isset($rss->entry) ) {
+		$items = $rss->entry;
+	}
+
+	foreach($items as $item) {
+		$guid = '';
 		if( isset($item->guid) ) {
-			$guid = $item->guid;
+			$guid = (string)$item->guid;
 		} elseif( isset($item->id) ) {
-			$guid = $item->id;
+			$guid = (string)$item->id;
 		} else {
 			continue;
 		}
 
-		if( isset($articles[$guid]) ) {
+		if( isset($articles) 
+			&& is_array($articles) 
+			&& isset($articles[$guid]) ) {
 			continue;
 		}
 
@@ -67,6 +74,9 @@ function ciniki_newsaggregator_updateRSSArticles($ciniki, $feed_id, $rss) {
 		if( isset($namespaces['dc']) ) {
 			$dc = $item->children($namespaces['dc']);
 		}
+		if( isset($namespaces['content']) ) {
+			$ns_content = $item->children($namespaces['content']);
+		}
 
 		//
 		// Get the article details
@@ -75,17 +85,29 @@ function ciniki_newsaggregator_updateRSSArticles($ciniki, $feed_id, $rss) {
 		$url = '';
 		$content = '';
 		if( isset($dc) && isset($dc->date) ) {
-			$published_date = strtotime($dc->pubDate);
+			$published_date = strtotime($dc->date);
 		} elseif( isset($item->pubDate) ) {
 			$published_date = strtotime($item->pubDate);
 		} elseif( isset($item->published) ) {
 			$published_date = strtotime($item->published);
+		} elseif( isset($item->updated) ) {
+			$published_date = strtotime($item->updated);
 		}
-		if( isset($item->link) ) {
+
+		if( count($item->link) > 0 ) {
+			foreach($item->link as $link) {
+				if( isset($link['rel']) && $link['rel'] == 'alternate' 
+					&& isset($link['href']) && $link['href'] != '' ) {
+					$url = $link['href'];
+				}
+			}
+		} elseif( isset($item->link) ) {
 			$url = $item->link;
 		}
 
-		if( isset($item->content) ) {
+		if( isset($ns_content) && isset($ns_content->encoded) ) {
+			$content = $ns_content->encoded;
+		} elseif( isset($item->content) ) {
 			$content = $item->content;
 		} elseif( isset($item->summary) ) {
 			$content = $item->summary;
@@ -119,7 +141,6 @@ function ciniki_newsaggregator_updateRSSArticles($ciniki, $feed_id, $rss) {
 			. "'" . ciniki_core_dbQuote($ciniki, $guid) . "', "
 			. "UTC_TIMESTAMP(), UTC_TIMESTAMP())"
 			. "";
-		error_log($strsql);
 		$rc = ciniki_core_dbInsert($ciniki, $strsql, 'ciniki.newsaggregator');
 		// Ignore the return of 'exists', only error on fail
 		if( $rc['stat'] == 'fail' ) {

@@ -13,7 +13,7 @@
 # site_url:			The URL to the site the feed is from, as pulled from the feed header.
 # description:		The description of the RSS feed as pulled from the feed header.
 #
-# update_frequency:	The number of minutes between updates.  This should default to 60.
+# update_frequency:	The number of seconds between updates.  This should default to 3600.
 #
 # last_checked:		The UTC date and time the rss was last fetched and the articles updated.
 #

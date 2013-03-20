@@ -89,6 +89,19 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
 			if( $rss === false ) {
 				return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'919', 'msg'=>'Invalid RSS feed'));
 			}
+
+			$args['title'] = '';
+			if( isset($rss->channel->title) ) {
+				$args['title'] = $rss->channel->title;
+			}
+			$args['site_url'] = '';
+			if( isset($rss->channel->link) ) {
+				$args['site_url'] = $rss->channel->link;
+			}
+			$args['description'] = '';
+			if( isset($rss->channel->description) ) {
+				$args['description'] = $rss->channel->description;
+			}
 			
 			//
 			// Get a new UUID
@@ -105,10 +118,14 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
 			// Add the feed
 			//
 			$strsql = "INSERT INTO ciniki_newsaggregator_feeds (uuid, feed_url, "
-				. "update_frequency, date_added, last_updated) VALUES ("
+				. "title, site_url, description, update_frequency, last_checked, date_added, last_updated) VALUES ("
 				. "'" . ciniki_core_dbQuote($ciniki, $args['uuid']) . "', "
 				. "'" . ciniki_core_dbQuote($ciniki, $args['feed_url']) . "', "
-				. "'60', "
+				. "'" . ciniki_core_dbQuote($ciniki, $args['title']) . "', "
+				. "'" . ciniki_core_dbQuote($ciniki, $args['site_url']) . "', "
+				. "'" . ciniki_core_dbQuote($ciniki, $args['description']) . "', "
+				. "'3600', "
+				. "UTC_TIMESTAMP(), "
 				. "UTC_TIMESTAMP(), UTC_TIMESTAMP())";
 			$rc = ciniki_core_dbInsert($ciniki, $strsql, 'ciniki.newsaggregator');
 			if( $rc['stat'] != 'ok' ) {
@@ -117,15 +134,18 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
 			}
 			$args['feed_id'] = $rc['insert_id'];
 
-			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 
-				'ciniki_newsaggregator_history', 0, 
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 'ciniki_newsaggregator_history', 0, 
 				1, 'ciniki_newsaggregator_feeds', $args['feed_id'], 'uuid', $args['uuid']);
-			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 
-				'ciniki_newsaggregator_history', 0, 
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 'ciniki_newsaggregator_history', 0, 
 				1, 'ciniki_newsaggregator_feeds', $args['feed_id'], 'feed_url', $args['feed_url']);
-			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 
-				'ciniki_newsaggregator_history', 0, 
-				1, 'ciniki_newsaggregator_feeds', $args['feed_id'], 'update_frequency', '60');
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 'ciniki_newsaggregator_history', 0, 
+				1, 'ciniki_newsaggregator_feeds', $args['feed_id'], 'title', $args['title']);
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 'ciniki_newsaggregator_history', 0, 
+				1, 'ciniki_newsaggregator_feeds', $args['feed_id'], 'site_url', $args['site_url']);
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 'ciniki_newsaggregator_history', 0, 
+				1, 'ciniki_newsaggregator_feeds', $args['feed_id'], 'description', $args['description']);
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 'ciniki_newsaggregator_history', 0, 
+				1, 'ciniki_newsaggregator_feeds', $args['feed_id'], 'update_frequency', '3600');
 			// Add to syncqueue
 			$ciniki['syncqueue'][] = array('push'=>'ciniki.newsaggregator.feed', 
 				'args'=>array('id'=>$args['feed_id']));

@@ -21,6 +21,9 @@ function ciniki_newsaggregator_articleList(&$ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Business'), 
         'category'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Category'), 
+        'feed_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Feed'), 
+        'read'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Read'), 
+        'limit'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Limit'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -39,6 +42,20 @@ function ciniki_newsaggregator_articleList(&$ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
 	$datetime_format = ciniki_users_datetimeFormat($ciniki);
 
+	if( isset($args['feed_id']) && $args['feed_id'] > 0 ) {
+		$strsql = "SELECT title, site_url "
+			. "FROM ciniki_newsaggregator_feeds "
+			. "WHERE id = '" . ciniki_core_dbQuote($ciniki, $args['feed_id']) . "' "
+			. "";
+		$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.newsaggregator', 'feed');
+		if( $rc['stat'] != 'ok' ) {
+			return $rc;
+		}
+		if( isset($rc['feed']) ) {
+			$feed = $rc['feed'];
+		}
+	}
+
 	//
 	// Get the list of categories for the requesting user
 	//
@@ -49,8 +66,11 @@ function ciniki_newsaggregator_articleList(&$ciniki) {
 		. "ciniki_newsaggregator_feeds.title AS feed_title "
 		. "FROM ciniki_newsaggregator_subscriptions "
 		. "LEFT JOIN ciniki_newsaggregator_feeds ON (ciniki_newsaggregator_subscriptions.feed_id = ciniki_newsaggregator_feeds.id ) "
-		. "LEFT JOIN ciniki_newsaggregator_articles ON (ciniki_newsaggregator_subscriptions.feed_id = ciniki_newsaggregator_articles.feed_id "
-			. "AND ciniki_newsaggregator_subscriptions.date_read_all < ciniki_newsaggregator_articles.published_date ) "
+		. "LEFT JOIN ciniki_newsaggregator_articles ON (ciniki_newsaggregator_subscriptions.feed_id = ciniki_newsaggregator_articles.feed_id ";
+	if( !isset($args['read']) || $args['read'] != 'yes' ) {
+		$strsql .= "AND ciniki_newsaggregator_subscriptions.date_read_all < ciniki_newsaggregator_articles.published_date ";
+	}
+	$strsql .= ") "
 		. "LEFT JOIN ciniki_newsaggregator_article_users ON (ciniki_newsaggregator_articles.id = ciniki_newsaggregator_article_users.article_id "
 			. "AND ciniki_newsaggregator_article_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 //			. "AND (ciniki_newsaggregator_article_users.flags&0x01) = 0 )
@@ -61,7 +81,25 @@ function ciniki_newsaggregator_articleList(&$ciniki) {
 	if( isset($args['category']) ) {
 		$strsql .= "AND ciniki_newsaggregator_subscriptions.category = '" . ciniki_core_dbQuote($ciniki, $args['category']) . "' ";
 	}
-	$strsql .= "ORDER BY ciniki_newsaggregator_feeds.title, ciniki_newsaggregator_articles.published_date DESC ";
+	if( isset($args['feed_id']) ) {
+		$strsql .= "AND ciniki_newsaggregator_subscriptions.feed_id = '" . ciniki_core_dbQuote($ciniki, $args['feed_id']) . "' ";
+	}
+	if( !isset($args['read']) || $args['read'] != 'yes' ) {
+		$strsql .= "AND NOT EXISTS (SELECT article_id FROM ciniki_newsaggregator_article_users "
+			. "WHERE ciniki_newsaggregator_articles.id = ciniki_newsaggregator_article_users.article_id "
+			. "AND ciniki_newsaggregator_article_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
+			. "AND (ciniki_newsaggregator_article_users.flags&0x01) = 1 "
+			. ") ";
+	} elseif( isset($args['read']) && $args['read'] == 'yes' ) {
+		$strsql .= "AND (EXISTS (SELECT article_id FROM ciniki_newsaggregator_article_users "
+				. "WHERE ciniki_newsaggregator_articles.id = ciniki_newsaggregator_article_users.article_id "
+				. "AND ciniki_newsaggregator_article_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
+				. "AND (ciniki_newsaggregator_article_users.flags&0x01) = 1 "
+				. ") "
+			. "OR ciniki_newsaggregator_subscriptions.date_read_all > ciniki_newsaggregator_articles.published_date "
+			. ")";
+	}
+	$strsql .= "ORDER BY ciniki_newsaggregator_articles.published_date DESC ";
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.newsaggregator', array(
@@ -75,6 +113,10 @@ function ciniki_newsaggregator_articleList(&$ciniki) {
 		return array('stat'=>'ok', 'articles'=>array());
 	}
 
+	if( isset($feed) ) {
+		return array('stat'=>'ok', 'feed'=>$feed, 'articles'=>$rc['articles']);
+	}
+	
 	return array('stat'=>'ok', 'articles'=>$rc['articles']);
 }
 ?>
