@@ -94,7 +94,7 @@ function ciniki_newsaggregator_updateRSSArticles(&$ciniki, $feed_id, $rss) {
 			$published_date = strtotime($item->updated);
 		}
 
-		if( count($item->link) > 0 ) {
+		if( $item->link == '' ) {
 			foreach($item->link as $link) {
 				if( isset($link['rel']) && $link['rel'] == 'alternate' 
 					&& isset($link['href']) && $link['href'] != '' ) {
