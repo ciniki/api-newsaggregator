@@ -47,10 +47,12 @@ function ciniki_newsaggregator_articleGet(&$ciniki) {
 		. "ciniki_newsaggregator_articles.url, "
 		. "DATE_FORMAT(published_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS published_date, "
 		. "IF((ciniki_newsaggregator_article_users.flags&0x01)=1, 'yes', 'no') AS article_read, "
-		. "ciniki_newsaggregator_articles.content "
+		. "ciniki_newsaggregator_articles.content, "
+		. "ciniki_newsaggregator_feeds.title AS feed_title "
 		. "FROM ciniki_newsaggregator_articles "
 		. "LEFT JOIN ciniki_newsaggregator_article_users ON (ciniki_newsaggregator_articles.id = ciniki_newsaggregator_article_users.article_id "
 			. "AND ciniki_newsaggregator_article_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
+		. "LEFT JOIN ciniki_newsaggregator_feeds ON (ciniki_newsaggregator_articles.feed_id = ciniki_newsaggregator_feeds.id) "
 		. "WHERE ciniki_newsaggregator_articles.id = '" . ciniki_core_dbQuote($ciniki, $args['article_id']) . "' "
 		. "";
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
