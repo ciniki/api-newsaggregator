@@ -32,7 +32,7 @@ function ciniki_newsaggregator_feedArticleList(&$ciniki) {
 	// Make sure the user has permission to this method
     //  
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'newsaggregator', 'private', 'checkAccess');
-    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['business_id'], 'ciniki.newsaggregator.articleList'); 
+    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['business_id'], 'ciniki.newsaggregator.feedArticleList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
