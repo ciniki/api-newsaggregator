@@ -10,7 +10,7 @@
 // =======
 // <rsp stat="ok" />
 //
-function ciniki_newsaggregator_updateFeeds(&$ciniki) {
+function ciniki_newsaggregator_cron_updateFeeds(&$ciniki) {
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
