@@ -5,33 +5,33 @@
 #
 # Fields
 # ------
-# id:				The unique ID for each feed.
-# uuid:				The Universal Unique ID for each feed.
+# id:               The unique ID for each feed.
+# uuid:             The Universal Unique ID for each feed.
 #
-# feed_url:			The URL of the rss feed.
-# title:			The title for the news feed as pulled from the feed header.
-# site_url:			The URL to the site the feed is from, as pulled from the feed header.
-# description:		The description of the RSS feed as pulled from the feed header.
+# feed_url:         The URL of the rss feed.
+# title:            The title for the news feed as pulled from the feed header.
+# site_url:         The URL to the site the feed is from, as pulled from the feed header.
+# description:      The description of the RSS feed as pulled from the feed header.
 #
-# update_frequency:	The number of seconds between updates.  This should default to 3600.
+# update_frequency: The number of seconds between updates.  This should default to 3600.
 #
-# last_checked:		The UTC date and time the rss was last fetched and the articles updated.
+# last_checked:     The UTC date and time the rss was last fetched and the articles updated.
 #
-# date_added:		The UTC date and time the RSS feed was added to the system.
-# last_updated:		The UTC date and time the feed info was last updated.
+# date_added:       The UTC date and time the RSS feed was added to the system.
+# last_updated:     The UTC date and time the feed info was last updated.
 #
 CREATE TABLE ciniki_newsaggregator_feeds (
-	id int not null auto_increment PRIMARY KEY,
-	uuid char(36) not null,
-	feed_url varchar(255) not null,
-	title varchar(255) not null,
-	site_url varchar(255) not null,
-	description text not null,
-	update_frequency int not null,
-	last_checked datetime not null,
-	date_added datetime not null,
-	last_updated datetime not null,
-	unique index (feed_url),
-	index (last_checked),
-	index uuid (uuid, last_updated)
+    id int not null auto_increment PRIMARY KEY,
+    uuid char(36) not null,
+    feed_url varchar(255) not null,
+    title varchar(255) not null,
+    site_url varchar(255) not null,
+    description text not null,
+    update_frequency int not null,
+    last_checked datetime not null,
+    date_added datetime not null,
+    last_updated datetime not null,
+    unique index (feed_url),
+    index (last_checked),
+    index uuid (uuid, last_updated)
 ) ENGINE=InnoDB, COMMENT='v1.01';
