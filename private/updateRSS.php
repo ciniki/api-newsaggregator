@@ -28,7 +28,7 @@ function ciniki_newsaggregator_updateRSS(&$ciniki, $feed_id) {
         return $rc;
     }
     if( !isset($rc['feed']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'922', 'msg'=>'Unable to find feed'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.3', 'msg'=>'Unable to find feed'));
     }
     $feed = $rc['feed'];
 
@@ -39,7 +39,7 @@ function ciniki_newsaggregator_updateRSS(&$ciniki, $feed_id) {
     //
     $rss = simplexml_load_file($feed['feed_url']);
     if( $rss === false ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'923', 'msg'=>'Invalid RSS feed'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.4', 'msg'=>'Invalid RSS feed'));
     }
 
     $args = array();

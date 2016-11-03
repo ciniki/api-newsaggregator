@@ -55,7 +55,7 @@ function ciniki_newsaggregator_subscriptionGet(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['subscription']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'918', 'msg'=>"Unable to find the subscription"));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.10', 'msg'=>"Unable to find the subscription"));
     }
 
     return array('stat'=>'ok', 'subscription'=>$rc['subscription']);

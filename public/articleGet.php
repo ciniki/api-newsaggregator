@@ -61,7 +61,7 @@ function ciniki_newsaggregator_articleGet(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['article']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'916', 'msg'=>"Unable to find the article requested"));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.5', 'msg'=>"Unable to find the article requested"));
     }
 
     $article = $rc['article'];

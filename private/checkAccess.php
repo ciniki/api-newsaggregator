@@ -38,7 +38,7 @@ function ciniki_newsaggregator_checkAccess($ciniki, $business_id, $method) {
     }
 
     if( !isset($rc['ruleset']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'912', 'msg'=>'No permissions granted'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.1', 'msg'=>'No permissions granted'));
     }
 
     //
@@ -68,6 +68,6 @@ function ciniki_newsaggregator_checkAccess($ciniki, $business_id, $method) {
     //
     // By default, fail
     //
-    return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'914', 'msg'=>'Access denied.'));
+    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.2', 'msg'=>'Access denied.'));
 }
 ?>

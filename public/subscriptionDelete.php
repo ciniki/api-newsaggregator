@@ -69,7 +69,7 @@ function ciniki_newsaggregator_subscriptionDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['feed']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1289', 'msg'=>'Unable to find feed'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.9', 'msg'=>'Unable to find feed'));
     }
     $feed = $rc['feed'];
 

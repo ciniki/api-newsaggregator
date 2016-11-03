@@ -42,7 +42,7 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
         || (!isset($args['feed_id']) && isset($args['feed_url']) && $args['feed_url'] == '')
         || (!isset($args['feed_url']) && isset($args['feed_id']) && $args['feed_id'] == '')
         ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'915', 'msg'=>'You must specify either a feed'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.6', 'msg'=>'You must specify either a feed'));
     }
 
     //  
@@ -87,7 +87,7 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
             //
             $rss = simplexml_load_file($args['feed_url']);
             if( $rss === false ) {
-                return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'919', 'msg'=>'Invalid RSS feed'));
+                return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.7', 'msg'=>'Invalid RSS feed'));
             }
 
             $args['title'] = '';
@@ -196,7 +196,7 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
     }
     if( !isset($rc['insert_id']) || $rc['insert_id'] < 1 ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.newsaggregator');
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'917', 'msg'=>'Unable to add subscription'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.newsaggregator.8', 'msg'=>'Unable to add subscription'));
     }
     $subscription_id = $rc['insert_id'];
 
