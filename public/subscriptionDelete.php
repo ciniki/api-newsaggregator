@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business to add the subscription to.
+// tnid:         The ID of the tenant to add the subscription to.
 // feed_id:             The ID of an existing feed to subscribe to.
 // feed_url:            The URL of the feed.
 // category:            The category for the subscription.
@@ -24,7 +24,7 @@ function ciniki_newsaggregator_subscriptionDelete(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'feed_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Feed'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
@@ -34,10 +34,10 @@ function ciniki_newsaggregator_subscriptionDelete(&$ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'newsaggregator', 'private', 'checkAccess');
-    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['business_id'], 'ciniki.newsaggregator.subscriptionDelete'); 
+    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['tnid'], 'ciniki.newsaggregator.subscriptionDelete'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
@@ -95,11 +95,11 @@ function ciniki_newsaggregator_subscriptionDelete(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'newsaggregator');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'newsaggregator');
 
     return array('stat'=>'ok');
 }

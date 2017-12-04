@@ -7,7 +7,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business to add the exhibition to.
+// tnid:         The ID of the tenant to add the exhibition to.
 //
 // Returns
 // -------
@@ -19,7 +19,7 @@ function ciniki_newsaggregator_articleGet(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Tenant'), 
         'article_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Article'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
@@ -31,7 +31,7 @@ function ciniki_newsaggregator_articleGet(&$ciniki) {
     // Make sure the user has permission to this method
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'newsaggregator', 'private', 'checkAccess');
-    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['business_id'], 'ciniki.newsaggregator.articleGet'); 
+    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['tnid'], 'ciniki.newsaggregator.articleGet'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }

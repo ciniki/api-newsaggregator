@@ -7,16 +7,16 @@
 // Arguments
 // =========
 // ciniki:
-// business_id:         The ID of the business the request is for.
+// tnid:         The ID of the tenant the request is for.
 // method:              The requested public method.
 // 
 // Returns
 // =======
 // <rsp stat="ok" />
 //
-function ciniki_newsaggregator_checkAccess($ciniki, $business_id, $method) {
+function ciniki_newsaggregator_checkAccess($ciniki, $tnid, $method) {
     //
-    // Most methods won't need to check the business id
+    // Most methods won't need to check the tenant id
     //
     $user_methods = array(
         'ciniki.newsaggregator.articleList',
@@ -24,15 +24,15 @@ function ciniki_newsaggregator_checkAccess($ciniki, $business_id, $method) {
         'ciniki.newsaggregator.subscriptionList',
         'ciniki.newsaggregator.subscriptionListCategories',
         );
-    if( ($business_id == null || $business_id == '' || $business_id == 0 || $business_id == '0') && in_array($method, $user_methods) ) {
+    if( ($tnid == null || $tnid == '' || $tnid == 0 || $tnid == '0') && in_array($method, $user_methods) ) {
         return array('stat'=>'ok');
     }
 
     //
-    // Check if the business is active and the module is enabled
+    // Check if the tenant is active and the module is enabled
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'checkModuleAccess');
-    $rc = ciniki_businesses_checkModuleAccess($ciniki, $business_id, 'ciniki', 'newsaggregator');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'checkModuleAccess');
+    $rc = ciniki_tenants_checkModuleAccess($ciniki, $tnid, 'ciniki', 'newsaggregator');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -42,17 +42,17 @@ function ciniki_newsaggregator_checkAccess($ciniki, $business_id, $method) {
     }
 
     //
-    // Check the users is a part of the business
+    // Check the users is a part of the tenant
     //
-    $strsql = "SELECT business_id, user_id FROM ciniki_business_users "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+    $strsql = "SELECT tnid, user_id FROM ciniki_tenant_users "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
         . "AND package = 'ciniki' "
         . "AND status = 10 "
         . "AND (permission_group = 'owners' OR permission_group = 'employees' OR permission_group = 'resellers' ) "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
-    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.businesses', 'user');
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.tenants', 'user');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

@@ -3,8 +3,8 @@
 # -----------
 # This table stores the users who have read an article, or bookmarked the article.
 # 
-# This table does not link to the businesses because we want a read article to appear
-# read in all businesses the user is a part of.
+# This table does not link to the tenants because we want a read article to appear
+# read in all tenants the user is a part of.
 #
 # Fields
 # ------

@@ -7,7 +7,7 @@
 # ------
 # id:                   The ID of the subscription.
 # uuid:                 The Universal Unique ID for the subscription.
-# business_id:          The ID of the business the subscription is attached to.
+# tnid:                 The ID of the tenant the subscription is attached to.
 #
 # user_id:              The ID of the user who subscribed to the feed.
 # feed_id:              The ID of the feed the user subscribed to.
@@ -27,7 +27,7 @@
 create table ciniki_newsaggregator_subscriptions (
     id int not null auto_increment PRIMARY KEY,
     uuid char(36) not null,
-    business_id int not null,
+    tnid int not null,
     user_id int not null,
     feed_id int not null,
     category varchar(150) not null,
@@ -36,5 +36,5 @@ create table ciniki_newsaggregator_subscriptions (
     date_added datetime not null,
     last_updated datetime not null,
     index (user_id, feed_id),
-    index uuid (business_id, uuid, last_updated)
+    index uuid (tnid, uuid, last_updated)
 ) ENGINE=InnoDB, COMMENT='v1.01';

@@ -326,7 +326,7 @@ function ciniki_newsaggregator_main() {
 
     this.showMenu = function(cb) {
         var rsp = M.api.getJSONCb('ciniki.newsaggregator.subscriptionListCategories', 
-            {'business_id':M.curBusinessID}, function(rsp) {
+            {'tnid':M.curTenantID}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -363,9 +363,9 @@ function ciniki_newsaggregator_main() {
         }
         var args = {};
         if( this.feeds.category != null ) {
-            args = {'business_id':M.curBusinessID, 'category':this.feeds.category};
+            args = {'tnid':M.curTenantID, 'category':this.feeds.category};
         } else {
-            args = {'business_id':M.curBusinessID};
+            args = {'tnid':M.curTenantID};
         }
         var rsp = M.api.getJSONCb('ciniki.newsaggregator.subscriptionList', args, function(rsp) {
             if( rsp.stat != 'ok' ) {
@@ -401,11 +401,11 @@ function ciniki_newsaggregator_main() {
         }
         var args = {};
         if( this.articles.category != null ) {
-            args = {'business_id':M.curBusinessID, 'category':this.articles.category};
+            args = {'tnid':M.curTenantID, 'category':this.articles.category};
         } else if( this.articles.feed_id != null ) {
-            args = {'business_id':M.curBusinessID, 'feed_id':this.articles.feed_id};
+            args = {'tnid':M.curTenantID, 'feed_id':this.articles.feed_id};
         } else {
-            args = {'business_id':M.curBusinessID};
+            args = {'tnid':M.curTenantID};
         }
         var rsp = M.api.getJSONCb('ciniki.newsaggregator.articleList', args, function(rsp) {
             if( rsp.stat != 'ok' ) {
@@ -425,7 +425,7 @@ function ciniki_newsaggregator_main() {
         }
         // Load articles
         var rsp = M.api.getJSONCb('ciniki.newsaggregator.feedArticleList', 
-            {'business_id':M.curBusinessID, 'feed_id':this.feed.feed_id}, function(rsp) {
+            {'tnid':M.curTenantID, 'feed_id':this.feed.feed_id}, function(rsp) {
                 M.ciniki_newsaggregator_main.feed.data = rsp;
                 if( rsp.unread != null && rsp.unread.length > 0 ) {
                     M.ciniki_newsaggregator_main.feed.sections.unread.visible = 'yes';
@@ -464,7 +464,7 @@ function ciniki_newsaggregator_main() {
             M.ciniki_newsaggregator_main.article.cb = cb;
         }
         var rsp = M.api.getJSONCb('ciniki.newsaggregator.articleGet', 
-            {'business_id':M.curBusinessID, 'article_id':this.article.article_id}, 
+            {'tnid':M.curTenantID, 'article_id':this.article.article_id}, 
             M.ciniki_newsaggregator_main.article.onloadCb);
     };
 
@@ -475,7 +475,7 @@ function ciniki_newsaggregator_main() {
         }
         if( this.edit.subscription_id > 0 ) {
             var rsp = M.api.getJSONCb('ciniki.newsaggregator.subscriptionGet', 
-                {'business_id':M.curBusinessID, 'subscription_id':this.edit.subscription_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'subscription_id':this.edit.subscription_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -501,7 +501,7 @@ function ciniki_newsaggregator_main() {
             var c = this.edit.serializeFormData('no');
             if( c != '' ) {
                 var rsp = M.api.postJSONFormData('ciniki.newsaggregator.subscriptionUpdate', 
-                    {'business_id':M.curBusinessID, 'subscription_id':this.edit.subscription_id}, c, function(rsp) {
+                    {'tnid':M.curTenantID, 'subscription_id':this.edit.subscription_id}, c, function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
                             return false;
@@ -514,7 +514,7 @@ function ciniki_newsaggregator_main() {
         } else {
             var c = this.edit.serializeForm('yes');
             if( c != null ) {
-                var rsp = M.api.postJSONFormData('ciniki.newsaggregator.subscriptionAdd', {'business_id':M.curBusinessID}, c,
+                var rsp = M.api.postJSONFormData('ciniki.newsaggregator.subscriptionAdd', {'tnid':M.curTenantID}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -530,7 +530,7 @@ function ciniki_newsaggregator_main() {
     this.unsubFeed = function() {
         if( confirm("Are you sure you want to unsubscribe from this feed?") ) {
             var rsp = M.api.getJSONCb('ciniki.newsaggregator.subscriptionDelete', 
-                {'business_id':M.curBusinessID, 'feed_id':this.feed.feed_id}, function(rsp) {
+                {'tnid':M.curTenantID, 'feed_id':this.feed.feed_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;

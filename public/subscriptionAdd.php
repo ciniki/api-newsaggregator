@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business to add the subscription to.
+// tnid:         The ID of the tenant to add the subscription to.
 // feed_id:             The ID of an existing feed to subscribe to.
 // feed_url:            The URL of the feed.
 // category:            The category for the subscription.
@@ -24,7 +24,7 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'feed_id'=>array('required'=>'no', 'name'=>'Feed'), 
         'feed_url'=>array('required'=>'no', 'name'=>'URL'), 
         'category'=>array('required'=>'no', 'default'=>'', 'trimblanks'=>'yes', 'blank'=>'yes', 'name'=>'Category'),
@@ -47,10 +47,10 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
 
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'newsaggregator', 'private', 'checkAccess');
-    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['business_id'], 'ciniki.newsaggregator.subscriptionAdd'); 
+    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['tnid'], 'ciniki.newsaggregator.subscriptionAdd'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
@@ -178,12 +178,12 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
     //
     // Add the subscription to the database
     //
-    $strsql = "INSERT INTO ciniki_newsaggregator_subscriptions (uuid, business_id, "
+    $strsql = "INSERT INTO ciniki_newsaggregator_subscriptions (uuid, tnid, "
         . "user_id, feed_id, "
         . "category, flags, "
         . "date_added, last_updated) VALUES ("
         . "'" . ciniki_core_dbQuote($ciniki, $args['uuid']) . "', "
-        . "'" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "', "
+        . "'" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "', "
         . "'" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "', "
         . "'" . ciniki_core_dbQuote($ciniki, $args['feed_id']) . "', "
         . "'" . ciniki_core_dbQuote($ciniki, $args['category']) . "', "
@@ -213,7 +213,7 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
     foreach($changelog_fields as $field) {
         if( isset($args[$field]) && $args[$field] != '' ) {
             $rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.newsaggregator', 
-                'ciniki_newsaggregator_history', $args['business_id'], 
+                'ciniki_newsaggregator_history', $args['tnid'], 
                 1, 'ciniki_newsaggregator_subscriptions', $subscription_id, $field, $args[$field]);
         }
     }
@@ -227,11 +227,11 @@ function ciniki_newsaggregator_subscriptionAdd(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'newsaggregator');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'newsaggregator');
 
     $ciniki['syncqueue'][] = array('push'=>'ciniki.newsaggregator.subscription', 
         'args'=>array('id'=>$subscription_id));

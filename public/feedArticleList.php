@@ -7,7 +7,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business to add the exhibition to.
+// tnid:         The ID of the tenant to add the exhibition to.
 //
 // Returns
 // -------
@@ -19,7 +19,7 @@ function ciniki_newsaggregator_feedArticleList(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Tenant'), 
         'feed_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Feed'), 
         'limit'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Limit'), 
         )); 
@@ -32,7 +32,7 @@ function ciniki_newsaggregator_feedArticleList(&$ciniki) {
     // Make sure the user has permission to this method
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'newsaggregator', 'private', 'checkAccess');
-    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['business_id'], 'ciniki.newsaggregator.feedArticleList'); 
+    $rc = ciniki_newsaggregator_checkAccess($ciniki, $args['tnid'], 'ciniki.newsaggregator.feedArticleList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
@@ -74,8 +74,8 @@ function ciniki_newsaggregator_feedArticleList(&$ciniki) {
         . "LEFT JOIN ciniki_newsaggregator_article_users ON (ciniki_newsaggregator_articles.id = ciniki_newsaggregator_article_users.article_id "
             . "AND ciniki_newsaggregator_article_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
         . "WHERE ciniki_newsaggregator_subscriptions.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' ";
-    if( $args['business_id'] != '' && $args['business_id'] != '0' ) {
-        $strsql .= "AND ciniki_newsaggregator_subscriptions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
+    if( $args['tnid'] != '' && $args['tnid'] != '0' ) {
+        $strsql .= "AND ciniki_newsaggregator_subscriptions.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' ";
     }
     $strsql .= "AND ciniki_newsaggregator_subscriptions.feed_id = '" . ciniki_core_dbQuote($ciniki, $args['feed_id']) . "' ";
     $strsql .= "AND NOT EXISTS (SELECT article_id FROM ciniki_newsaggregator_article_users "
@@ -117,8 +117,8 @@ function ciniki_newsaggregator_feedArticleList(&$ciniki) {
         . "LEFT JOIN ciniki_newsaggregator_article_users ON (ciniki_newsaggregator_articles.id = ciniki_newsaggregator_article_users.article_id "
             . "AND ciniki_newsaggregator_article_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
         . "WHERE ciniki_newsaggregator_subscriptions.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' ";
-    if( $args['business_id'] != '' && $args['business_id'] != '0' ) {
-        $strsql .= "AND ciniki_newsaggregator_subscriptions.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
+    if( $args['tnid'] != '' && $args['tnid'] != '0' ) {
+        $strsql .= "AND ciniki_newsaggregator_subscriptions.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' ";
     }
     $strsql .= "AND ciniki_newsaggregator_subscriptions.feed_id = '" . ciniki_core_dbQuote($ciniki, $args['feed_id']) . "' ";
     $strsql .= "AND (EXISTS (SELECT article_id FROM ciniki_newsaggregator_article_users "
