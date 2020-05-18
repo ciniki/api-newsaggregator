@@ -528,9 +528,9 @@ function ciniki_newsaggregator_main() {
     };
 
     this.unsubFeed = function() {
-        if( confirm("Are you sure you want to unsubscribe from this feed?") ) {
-            var rsp = M.api.getJSONCb('ciniki.newsaggregator.subscriptionDelete', 
-                {'tnid':M.curTenantID, 'feed_id':this.feed.feed_id}, function(rsp) {
+        M.confirm("Are you sure you want to unsubscribe from this feed?",null,function() {
+            M.api.getJSONCb('ciniki.newsaggregator.subscriptionDelete', 
+                {'tnid':M.curTenantID, 'feed_id':M.ciniki_newsaggregator_main.feed.feed_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
